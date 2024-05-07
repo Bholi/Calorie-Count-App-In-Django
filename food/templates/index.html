@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homepage</title>
+     <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  
+  </style>
+  </head>
+ 
+  <body>
+    <form action="" method="post">
+      {% csrf_token %}
+      <select name="food" id="food">
+        {% for f in food %}
+        <option value="{{f.name}}">{{f.name}}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-success">Add</button>
+    </form>
+    <h1>Your Consumed Food Data</h1>
+    <br /><br />
+    <h3>Calorie Goal</h3>
+    <br />
+    <div class="row">
+      <div class="col-md-9 offset-1">
+        <div
+          class="progress"
+          role="progressbar"
+          aria-label="Basic example"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="0"
+        >
+          <div class="progress-bar" style="width: 0"></div>
+        </div>
+      </div>
+    </div>
+
+    <table id="table" class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Food</th>
+          <th scope="col">Calories</th>
+          <th scope="col">Carbohydrates</th>
+          <th scope="col">Fat</th>
+          <th scope="col">Protein</th>
+          <th scope="col">Remove Item</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in consume %}
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{c.item_name}}</td>
+          <td>{{c.item_name.calorie}}</td>
+          <td>{{c.item_name.carbs}}</td>
+          <td>{{c.item_name.fat}}</td>
+          <td>{{c.item_name.protein}}</td>
+          <td><a href="{% url 'delete' c.id %}" class="btn btn-danger">Remove</a></td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td><b>Total</b></td>
+          <td></td>
+          <td id="totalcal"></td>
+          <td id="totalcarbs"></td>
+          <td id="totalfat"></td>
+          <td id="totalpro"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="chart">
+        <canvas id="myChart" width="400" height="400"></canvas>
+    </div>
+  </body>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    var table = document.getElementById("table");
+    var carbs = 0,
+      fats = 0,
+      protein = 0,
+      cal = 0;
+    for (var i = 1; i < table.rows.length - 1; i++) {
+      console.log(table.rows[i].cells[i]);
+      carbs += parseFloat(table.rows[i].cells[3].innerHTML);
+      fats += parseFloat(table.rows[i].cells[4].innerHTML);
+      protein += parseFloat(table.rows[i].cells[5].innerHTML);
+      cal += parseFloat(table.rows[i].cells[2].innerHTML);
+      console.log(fats);
+      document.getElementById("totalcal").innerHTML = cal;
+      document.getElementById("totalcarbs").innerHTML = carbs;
+      document.getElementById("totalfat").innerHTML = fats;
+      document.getElementById("totalpro").innerHTML = protein;
+
+      var calPer = (cal/2000)*100;
+      document.getElementsByClassName('progress-bar')[0].setAttribute("style","width:"+calPer+"%");
+    }
+    var total = carbs+protein+fats
+    var carbsP = Math.round((carbs/total)*100);
+    var proteinP = Math.round((protein/total)*100);
+    var fatsP = Math.round((fats/total)*100);
+  const ctx = document.getElementById('myChart');
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Carbs '+carbsP+'%', 'Protein '+proteinP+'%', 'Fat '+fatsP+'%'],
+      datasets: [{
+        // label: '# of Votes',
+        data: [carbsP, proteinP, fatsP],
+        borderWidth: 1
+      }]
+    },
+    
+  });
+</script>
+</html>
